@@ -13,7 +13,7 @@ module I18n
       class << self
         attr_accessor :redis
         def connection
-``          @redis ||= Redis.new(url: determine_redis_provider, :driver => :synchrony)
+          @redis ||= Redis.new(url: determine_redis_provider, driver: :synchrony)
         end
         def determine_redis_provider
           ENV['I18N_REDIS_URL'] || ENV[ENV['REDIS_PROVIDER'] || 'REDIS_URL']

@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mock_redis", "< 1"
   spec.add_development_dependency "pry", '< 1'
 
-  spec.add_dependency 'i18n', '< 1'
-  spec.add_dependency 'i18n-tasks', '< 1'
+  spec.add_dependency 'i18n'
+  spec.add_dependency 'i18n-tasks'
   spec.add_dependency 'redis'
   spec.add_dependency 'hiredis', '~> 0.4.5'
   spec.add_dependency 'em-synchrony'
