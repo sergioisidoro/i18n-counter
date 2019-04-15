@@ -38,7 +38,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'i18n'
   spec.add_dependency 'i18n-tasks'
+  spec.add_dependency 'async-redis'
   spec.add_dependency 'redis'
-  spec.add_dependency 'hiredis', '~> 0.4.5'
-  spec.add_dependency 'em-synchrony'
 end

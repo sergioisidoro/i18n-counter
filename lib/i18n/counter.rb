@@ -1,5 +1,6 @@
 require 'i18n'
 require 'i18n/tasks'
+require 'async/redis'
 require 'redis'
 require "i18n/counter/version"
 require "i18n/counter/summary"
@@ -11,10 +12,17 @@ module I18n
 
     module I18nRedis
       class << self
+        attr_accessor :async_redis
         attr_accessor :redis
-        def connection
-          @redis ||= Redis.new(url: determine_redis_provider, driver: :synchrony)
+
+        def async_connection
+          @async_redis ||= Async::Redis::Client.new(determine_redis_provider)
         end
+
+        def connection
+          @redis ||= Redis.new(url: determine_redis_provider)
+        end
+
         def determine_redis_provider
           ENV['I18N_REDIS_URL'] || ENV[ENV['REDIS_PROVIDER'] || 'REDIS_URL']
         end
@@ -23,10 +31,15 @@ module I18n
 
     module Hook
       def lookup(locale, key, scope = [], options = {})
-        return super unless I18n::Counter.enabled?
-        separator = options[:separator] || I18n.default_separator
-        flat_key = I18n.normalize_keys(locale, key, scope, separator).join(separator)
-        I18nRedis.connection.incr(flat_key)
+
+        return super unless I18n::Counter.enabled? 
+
+        Async.run do
+          separator = options[:separator] || I18n.default_separator
+          flat_key = I18n.normalize_keys(locale, key, scope, separator).join(separator)
+          I18nRedis.async_connection.incr(flat_key)
+        end
+        
         super
       end
     end
