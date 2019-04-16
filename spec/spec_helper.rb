@@ -2,10 +2,10 @@ require "bundler/setup"
 require 'mock_redis'
 require "i18n/counter"
 require 'pry'
+
 Redis = MockRedis
 
 Dir['spec/support/**/*.rb'].each { |f| require "./#{f}" }
-
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -19,13 +19,13 @@ RSpec.configure do |config|
     I18n.available_locales = ['en', 'nb']
   end
   config.before :each do
-      Async.run do
-        I18n::Counter::I18nRedis.async_connection.flushdb!
-      end
-    
-      I18n::Counter::I18nRedis.connection.flushdb
-      allow_any_instance_of(I18n::Counter::Summary).to receive(:load_locales).and_return(I18n::Tasks::BaseTask.new(data: { read: ["spec/support/config/locales/%{locale}.yml"]}))
+    Async.run do
+      I18n::Counter::I18nRedis.async_connection.flushdb!
+    end
 
+    I18n::Counter::I18nRedis.connection.flushdb
+    allow_any_instance_of(
+      I18n::Counter::Summary).to receive(:load_locales).and_return(I18n::Tasks::BaseTask.new(data: { read: ["spec/support/config/locales/%{locale}.yml"]}))
   end
   # seed
   I18n.backend.store_translations(:en, foo: { bar: 'baz' })

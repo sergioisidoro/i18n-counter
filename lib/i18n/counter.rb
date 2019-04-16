@@ -15,6 +15,10 @@ module I18n
         attr_accessor :async_redis
         attr_accessor :redis
 
+        def ready?
+          determine_redis_provider
+        end
+
         def async_connection
           @async_redis ||= Async::Redis::Client.new(determine_redis_provider)
         end
@@ -32,14 +36,16 @@ module I18n
     module Hook
       def lookup(locale, key, scope = [], options = {})
 
-        return super unless I18n::Counter.enabled? 
+        if !I18n::Counter.enabled? || !I18nRedis.ready?
+          return super
+        end
 
         Async.run do
           separator = options[:separator] || I18n.default_separator
           flat_key = I18n.normalize_keys(locale, key, scope, separator).join(separator)
           I18nRedis.async_connection.incr(flat_key)
         end
-        
+
         super
       end
     end
