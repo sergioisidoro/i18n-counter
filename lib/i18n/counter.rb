@@ -40,11 +40,9 @@ module I18n
           return super
         end
 
-        Async.run do
-          separator = options[:separator] || I18n.default_separator
-          flat_key = I18n.normalize_keys(locale, key, scope, separator).join(separator)
-          I18nRedis.async_connection.incr(flat_key)
-        end
+        separator = options[:separator] || I18n.default_separator
+        flat_key = I18n.normalize_keys(locale, key, scope, separator).join(separator)
+        I18nRedis.async_connection.incr(flat_key)
 
         super
       end
