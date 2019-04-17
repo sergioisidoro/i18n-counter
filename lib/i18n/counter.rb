@@ -1,7 +1,7 @@
 require 'i18n'
 require 'i18n/tasks'
-require 'async/redis'
 require 'redis'
+require 'em-hiredis'
 require "i18n/counter/version"
 require "i18n/counter/summary"
 
@@ -20,7 +20,7 @@ module I18n
         end
 
         def async_connection
-          @async_redis ||= Async::Redis::Client.new(determine_redis_provider)
+          @async_redis ||= EM::Hiredis.connect(determine_redis_provider)
         end
 
         def connection
